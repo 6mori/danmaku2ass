@@ -851,6 +851,7 @@ def main():
         height = int(height)
     except ValueError:
         raise ValueError(_('Invalid stage size: %r') % args.size)
+    print(args.file)
     Danmaku2ASS(args.file, args.format, args.output, width, height, args.protect, args.font, args.fontsize, args.alpha, args.duration_marquee, args.duration_still, args.filter, args.filter_file, args.reduce)
 
 
