@@ -125,14 +125,29 @@ def ReadCommentsNiconico(f, fontsize):
     NiconicoColorMap = {'red': 0xff0000, 'pink': 0xff8080, 'orange': 0xffcc00, 'yellow': 0xffff00, 'green': 0x00ff00, 'cyan': 0x00ffff, 'blue': 0x0000ff, 'purple': 0xc000ff, 'black': 0x000000, 'niconicowhite': 0xcccc99, 'white2': 0xcccc99, 'truered': 0xcc0033, 'red2': 0xcc0033, 'passionorange': 0xff6600, 'orange2': 0xff6600, 'madyellow': 0x999900, 'yellow2': 0x999900, 'elementalgreen': 0x00cc66, 'green2': 0x00cc66, 'marineblue': 0x33ffcc, 'blue2': 0x33ffcc, 'nobleviolet': 0x6633cc, 'purple2': 0x6633cc}
     dom = xml.dom.minidom.parse(f)
     comment_element = dom.getElementsByTagName('chat')
+    voteOptions = []
     for idx, comment in enumerate(comment_element, start=1):
         try:
-            c = str(comment.childNodes[0].wholeText)
-            if c.startswith('/'):
-                continue  # ignore advanced comments
             pos = 0
             color = 0xffffff
             size = fontsize
+            c = str(comment.childNodes[0].wholeText)
+            if c.startswith('/vote'):
+                pos = 1
+                if c.startswith('/vote start'):
+                    voteOptions = c.split(' ')[3:]
+                    c = c[len('/vote start'):]
+                elif c.startswith('/vote showresult'):
+                    per = c.split(' ')[3:]
+                    per = list(map(lambda x: x[0:-1] + '.' + x[-1:] + '%', per))
+                    c = ' '.join(list(map(lambda x, y: x + ' ' + y, voteOptions, per)))
+            if c.startswith('/'):
+                continue  # ignore advanced comments
+            if comment.hasAttribute('name'):
+                pos = 1
+                c = '〘' + str(comment.getAttribute('name')) + '〙\n' + c
+                size = fontsize * 0.64
+                color = NiconicoColorMap['red']
             for mailstyle in str(comment.getAttribute('mail')).split():
                 if mailstyle == 'ue':
                     pos = 1
